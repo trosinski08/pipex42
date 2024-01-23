@@ -6,13 +6,14 @@
 /*   By: trosinsk <trosinsk@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 19:09:46 by trosinsk          #+#    #+#             */
-/*   Updated: 2024/01/22 15:45:32 by trosinsk         ###   ########.fr       */
+/*   Updated: 2024/01/23 02:08:10 by trosinsk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 #include <sys/wait.h>
 
+// sleep(10000);
 void	parser(char *cmd, char **envpath)
 {
 	char	**cmd_val;
@@ -42,10 +43,11 @@ void	infile_processing(char **argv, int *fd, char **envpath)
 		ft_putendl_fd("pipex: input: No such file or directory", 2);
 		exit (1);
 	}
-	dup2(fds, STDIN_FILENO);
-	dup2(fd[1], STDOUT_FILENO);
 	close(fd[0]);
+	dup2(fds, STDIN_FILENO);
 	close(fds);
+	dup2(fd[1], STDOUT_FILENO);
+	close(fd[1]);
 	parser(argv[2], envpath);
 }
 
@@ -56,10 +58,11 @@ void	outfile_processing(char **argv, int *fd, char **envpath)
 	fds = open(argv[4], O_CREAT | O_RDWR | O_TRUNC, 0644);
 	if (fds == -1)
 		exit (1);
-	dup2(fds, STDOUT_FILENO);
-	dup2(fd[0], STDIN_FILENO);
 	close(fd[1]);
+	dup2(fds, STDOUT_FILENO);
 	close(fds);
+	dup2(fd[0], STDIN_FILENO);
+	close(fd[0]);
 	parser(argv[3], envpath);
 }
 
@@ -82,8 +85,6 @@ int	main(int argc, char **argv, char **envpath)
 	if (pid1 == 0)
 		infile_processing(argv, fd, envpath);
 	outfile_processing(argv, fd, envpath);
-	close(fd[0]);
-	close(fd[1]);
 	waitpid(pid1, &status, 0);
 	if (WIFEXITED(status))
 		exit(WEXITSTATUS(status));

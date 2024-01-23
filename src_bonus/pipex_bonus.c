@@ -6,7 +6,7 @@
 /*   By: trosinsk <trosinsk@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/21 19:32:00 by trosinsk          #+#    #+#             */
-/*   Updated: 2024/01/22 16:36:55 by trosinsk         ###   ########.fr       */
+/*   Updated: 2024/01/23 01:59:49 by trosinsk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -42,16 +42,22 @@ void	pipe_maker(char *cmd, char **envpath)
 	if (pid == 0)
 	{
 		close(fd[0]);
-		close(fd[1]);
 		dup2(fd[1], STDOUT_FILENO);
+		close(fd[1]);
 		parser(cmd, envpath);
 	}
 	else
 	{
-		close(fd[0]);
 		close(fd[1]);
 		dup2(fd[0], STDIN_FILENO);
+		close(fd[0]);
 	}
+}
+
+void	error_argc(void)
+{
+	ft_putstr_fd("./pipex infile cmd cmd outfile\n", 2);
+	exit(1);
 }
 
 int	main( int argc, char **argv, char **envpath)
@@ -70,15 +76,14 @@ int	main( int argc, char **argv, char **envpath)
 		if (outfile_fd == -1)
 			exit (1);
 		dup2(infile_fd, STDIN_FILENO);
+		close(infile_fd);
 		while (i < argc - 2)
 			pipe_maker(argv[i++], envpath);
 		dup2(outfile_fd, STDOUT_FILENO);
+		close(outfile_fd);
 		parser(argv[argc - 2], envpath);
 		wait(NULL);
 	}
 	else
-	{
-		ft_putstr_fd("./pipex infile cmd cmd outfile\n", 2);
-		exit(1);
-	}
+		error_argc();
 }
