@@ -6,31 +6,63 @@
 /*   By: trosinsk <trosinsk@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 19:09:46 by trosinsk          #+#    #+#             */
-/*   Updated: 2024/01/23 02:08:10 by trosinsk         ###   ########.fr       */
+/*   Updated: 2024/02/03 20:34:29 by trosinsk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
-#include <sys/wait.h>
 
 // sleep(10000);
+// TO DO
+//check if "" are closed, ex.: if strchr != strrchr
+
+static void	remove_chars(char *str, char *c)
+{
+	char	*char_pos;
+	int		i;
+
+	i = 0;
+	if (str != NULL)
+	{
+		while (c[i] != '\0')
+		{
+			char_pos = ft_strchr(str, c[i]);
+			while (char_pos != NULL)
+			{
+				ft_strlcpy(char_pos, char_pos + 1, ft_strlen(char_pos));
+				char_pos = ft_strchr(str, c[i]);
+			}
+			i++;
+		}
+	}
+}
+
 void	parser(char *cmd, char **envpath)
 {
 	char	**cmd_val;
 	char	*path;
 
-	if (ft_strncmp(cmd, "awk", ft_strlen("awk")) == 0)
-		cmd = ft_char_remove(cmd, '\'');
-	cmd_val = ft_split(cmd, ' ');
-	path = get_path(cmd_val[0], envpath);
-	if (execve(path, cmd_val, envpath) == -1)
+	remove_chars(cmd, "\\");
+	if (ft_strnstr(cmd, "./", ft_strlen(cmd)) && ft_strchr(cmd, ' ') != 0)
 	{
-		ft_putstr_fd("pipex: ", 2);
-		ft_putstr_fd(cmd_val[0], 2);
-		ft_putendl_fd(": command not found", 2);
-		ft_free(cmd_val);
-		exit(127);
+		path = get_path(cmd, envpath);
+		if (execve(path, &cmd, envpath) == -1)
+		{
+			ft_putstr_fd("pipex: ", 2);
+			ft_putstr_fd(path, 2);
+			ft_putendl_fd(": command not found", 2);
+			exit(127);
+		}
 	}
+	if (!ft_strchr(cmd, '\'') && !ft_strchr(cmd, '\"'))
+	{
+		cmd_val = ft_split(cmd, ' ');
+		path = get_path(cmd_val[0], envpath);
+		if (execve(path, cmd_val, envpath) == -1)
+			cmd_error_print(cmd_val[0], cmd_val);
+	}
+	else
+		quotes_way(cmd, envpath);
 }
 
 void	infile_processing(char **argv, int *fd, char **envpath)

@@ -6,28 +6,21 @@
 /*   By: trosinsk <trosinsk@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 22:11:43 by trosinsk          #+#    #+#             */
-/*   Updated: 2024/01/22 16:35:59 by trosinsk         ###   ########.fr       */
+/*   Updated: 2024/02/03 20:05:40 by trosinsk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-char	*ft_char_remove(char *cmd, char c)
+char	**envpath_create(char **envpath)
 {
-	char	*dst;
+	char	*path[2];
+	char	**new_path;
 
-	dst = NULL;
-	while (*cmd)
-	{
-		if (*cmd != c)
-		{
-			*dst = *cmd;
-			dst++;
-		}
-		cmd++;
-	}
-	*dst = '\0';
-	return (dst);
+	path[0] = "/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin";
+	path[1] = NULL;
+	new_path = ft_split(path[0], ':');
+	return (new_path);
 }
 
 void	ft_free(char **tab)
@@ -43,6 +36,8 @@ void	ft_free(char **tab)
 	free(tab);
 }
 
+	// if (!env[0])
+	// 	env = envpath_create(env);
 char	*my_getenv(char *name, char **env)
 {
 	int		i;
@@ -73,24 +68,35 @@ char	*get_path(char *cmd, char **env)
 	char	*exec;
 	char	**allpath;
 	char	*path_part;
-	char	**cmd_val;
 
 	i = -1;
-	allpath = ft_split(my_getenv("PATH", env), ':');
-	cmd_val = ft_split(cmd, ' ');
+	if (env[0] != NULL)
+		allpath = ft_split(my_getenv("PATH", env), ':');
+	else
+		allpath = envpath_create(env);
 	while (allpath[++i])
 	{
 		path_part = ft_strjoin(allpath[i], "/");
-		exec = ft_strjoin(path_part, cmd_val[0]);
+		exec = ft_strjoin(path_part, cmd);
 		free(path_part);
 		if (access(exec, F_OK | X_OK) == 0)
-		{
-			ft_free(cmd_val);
 			return (exec);
-		}
 		free(exec);
 	}
 	ft_free(allpath);
-	ft_free(cmd_val);
 	return (cmd);
+}
+
+char	*ft_strcpy(char *dst, char *src)
+{
+	int	i;
+
+	i = 0;
+	while (src[i])
+	{
+		dst[i] = src[i];
+		i++;
+	}
+	dst[i] = '\0';
+	return (dst);
 }

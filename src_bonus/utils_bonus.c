@@ -6,11 +6,22 @@
 /*   By: trosinsk <trosinsk@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/21 19:31:28 by trosinsk          #+#    #+#             */
-/*   Updated: 2024/01/21 22:12:30 by trosinsk         ###   ########.fr       */
+/*   Updated: 2024/02/03 21:08:34 by trosinsk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
+
+char	**envpath_create(char **envpath)
+{
+	char	*path[2];
+	char	**new_path;
+
+	path[0] = "/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin";
+	path[1] = NULL;
+	new_path = ft_split(path[0], ':');
+	return (new_path);
+}
 
 void	ft_free(char **tab)
 {
@@ -55,24 +66,35 @@ char	*get_path(char *cmd, char **env)
 	char	*exec;
 	char	**allpath;
 	char	*path_part;
-	char	**cmd_val;
 
 	i = -1;
-	allpath = ft_split(my_getenv("PATH", env), ':');
-	cmd_val = ft_split(cmd, ' ');
+	if (env[0] != NULL)
+		allpath = ft_split(my_getenv("PATH", env), ':');
+	else
+		allpath = envpath_create(env);
 	while (allpath[++i])
 	{
 		path_part = ft_strjoin(allpath[i], "/");
-		exec = ft_strjoin(path_part, cmd_val[0]);
+		exec = ft_strjoin(path_part, cmd);
 		free(path_part);
 		if (access(exec, F_OK | X_OK) == 0)
-		{
-			ft_free(cmd_val);
 			return (exec);
-		}
 		free(exec);
 	}
 	ft_free(allpath);
-	ft_free(cmd_val);
 	return (cmd);
+}
+
+char	*ft_strcpy(char *dst, char *src)
+{
+	int	i;
+
+	i = 0;
+	while (src[i])
+	{
+		dst[i] = src[i];
+		i++;
+	}
+	dst[i] = '\0';
+	return (dst);
 }
