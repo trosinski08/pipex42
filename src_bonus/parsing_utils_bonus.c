@@ -6,7 +6,7 @@
 /*   By: trosinsk <trosinsk@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 20:25:48 by trosinsk          #+#    #+#             */
-/*   Updated: 2024/02/03 21:12:29 by trosinsk         ###   ########.fr       */
+/*   Updated: 2024/02/04 21:10:32 by trosinsk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -60,11 +60,21 @@ void	quotes_way(char *cmd, char **envpath)
 		cmd_error_print(cmd_line[0], cmd_line);
 }
 
-void	cmd_error_print(char *str, char **arr)
+char	**envpath_create(char **envpath)
 {
-	ft_putstr_fd("pipex: ", 2);
-	ft_putstr_fd(str, 2);
-	ft_putendl_fd(": command not found", 2);
-	ft_free(arr);
-	exit(127);
+	char	*path[2];
+	char	**new_path;
+
+	path[0] = "/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin";
+	path[1] = NULL;
+	new_path = ft_split(path[0], ':');
+	return (new_path);
 }
+// void	cmd_error_print(char *str, char **arr)
+// {
+// 	ft_putstr_fd("pipex: ", 2);
+// 	ft_putstr_fd(str, 2);
+// 	ft_putendl_fd(": command not found", 2);
+// 	ft_free(arr);
+// 	exit(127);
+// }

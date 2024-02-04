@@ -11,7 +11,8 @@ SRC = src/pipex.c \
 
 BNS = src_bonus/pipex_bonus.c \
 	  src_bonus/utils_bonus.c \
-	  src_bonus/parsing_utils_bonus.c 
+	  src_bonus/parsing_utils_bonus.c \
+	  src_bonus/errors.c
 
 
 OBJ = ${SRC:.c=.o}

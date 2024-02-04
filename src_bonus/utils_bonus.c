@@ -6,22 +6,11 @@
 /*   By: trosinsk <trosinsk@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/21 19:31:28 by trosinsk          #+#    #+#             */
-/*   Updated: 2024/02/03 21:08:34 by trosinsk         ###   ########.fr       */
+/*   Updated: 2024/02/04 20:28:49 by trosinsk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
-
-char	**envpath_create(char **envpath)
-{
-	char	*path[2];
-	char	**new_path;
-
-	path[0] = "/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin";
-	path[1] = NULL;
-	new_path = ft_split(path[0], ':');
-	return (new_path);
-}
 
 void	ft_free(char **tab)
 {
@@ -99,7 +88,7 @@ char	*ft_strcpy(char *dst, char *src)
 	return (dst);
 }
 
-int mini_gnl(char **line)
+int	mini_gnl(char **line)
 {
 	char	*buffer;
 	int		i;
