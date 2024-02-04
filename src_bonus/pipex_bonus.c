@@ -11,6 +11,8 @@
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
+#include <process.h>
+#include <sys/types.h>
 
 // sleep(10000);
 // void	quotes_way(char *cmd, char **envpath)
@@ -107,6 +109,36 @@ void	input_error(void)
 	exit (1);
 }
 
+void	here_doc(char *delimiter, int argc)
+{
+	pid_t	read;
+	int		fd[2];
+	char	*line;
+
+	if (argc < 6)
+		usage();
+	if (pipe(fd) == -1)
+		error();
+	read = fork();
+	if (read == 0)
+	{
+		close(fd[0]);
+		while (get_next_line(&line))
+		{
+			if (ft_strncmp(line, delimiter, ft_strlen(delimiter)) == 0)
+				exit(EXIT_SUCCESS);
+			write(fd[1], line, ft_strlen(line));
+		}
+	}
+	else
+	{
+		close(fd[1]);
+		dup2(fd[0], STDIN_FILENO);
+		wait(NULL);
+	}
+}
+
+
 int	main( int argc, char **argv, char **envpath)
 {
 	int		i;
@@ -115,17 +147,27 @@ int	main( int argc, char **argv, char **envpath)
 
 	if (argc >= 5)
 	{
+		
+		if (ft_strncmp(argv[1], "here_doc", 8) == 0)
+		{
+			i = 3;
+			outfile_fd = open_file(argv[argc - 1], 0);
+			here_doc(argv[2], argc);
+		}
+		else
+		{
 		i = 2;
 		infile_fd = open(argv[1], O_RDONLY, 0644);
 		if (infile_fd == -1)
 			input_error();
 		dup2(infile_fd, STDIN_FILENO);
 		close(infile_fd);
-		while (i < argc - 2)
-			pipe_maker(argv[i++], envpath);
 		outfile_fd = open(argv[argc - 1], O_CREAT | O_RDWR | O_TRUNC, 0644);
 		if (outfile_fd == -1)
 			exit (1);
+		}
+		while (i < argc - 2)
+			pipe_maker(argv[i++], envpath);
 		dup2(outfile_fd, STDOUT_FILENO);
 		close(outfile_fd);
 		parser(argv[argc - 2], envpath);

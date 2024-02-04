@@ -16,10 +16,11 @@
 # include <stdlib.h>
 # include <stdio.h>
 # include <string.h>
-# include <unistd.h>
-# include <sys/wait.h>
+// # include <unistd.h>
+#include <io.h>
+// # include <sys/wait.h>
 # include <fcntl.h>
-# include "../libft/libft.h"
+// # include "../libft/libft.h"
 
 char	*get_path(char *cmd_val, char **env);
 char	*my_getenv(char *name, char **env);
