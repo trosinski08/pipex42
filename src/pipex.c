@@ -6,13 +6,12 @@
 /*   By: trosinsk <trosinsk@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 19:09:46 by trosinsk          #+#    #+#             */
-/*   Updated: 2024/02/03 20:34:29 by trosinsk         ###   ########.fr       */
+/*   Updated: 2024/02/04 20:43:35 by trosinsk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
-// sleep(10000);
 // TO DO
 //check if "" are closed, ex.: if strchr != strrchr
 
@@ -47,12 +46,7 @@ void	parser(char *cmd, char **envpath)
 	{
 		path = get_path(cmd, envpath);
 		if (execve(path, &cmd, envpath) == -1)
-		{
-			ft_putstr_fd("pipex: ", 2);
-			ft_putstr_fd(path, 2);
-			ft_putendl_fd(": command not found", 2);
-			exit(127);
-		}
+			exit(0);
 	}
 	if (!ft_strchr(cmd, '\'') && !ft_strchr(cmd, '\"'))
 	{
@@ -98,6 +92,7 @@ void	outfile_processing(char **argv, int *fd, char **envpath)
 	parser(argv[3], envpath);
 }
 
+	// sleep(10000);
 int	main(int argc, char **argv, char **envpath)
 {
 	int		fd[2];
@@ -117,6 +112,8 @@ int	main(int argc, char **argv, char **envpath)
 	if (pid1 == 0)
 		infile_processing(argv, fd, envpath);
 	outfile_processing(argv, fd, envpath);
+	close (STDIN_FILENO);
+	close (STDOUT_FILENO);
 	waitpid(pid1, &status, 0);
 	if (WIFEXITED(status))
 		exit(WEXITSTATUS(status));

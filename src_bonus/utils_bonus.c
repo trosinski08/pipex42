@@ -6,22 +6,11 @@
 /*   By: trosinsk <trosinsk@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/21 19:31:28 by trosinsk          #+#    #+#             */
-/*   Updated: 2024/02/03 21:08:34 by trosinsk         ###   ########.fr       */
+/*   Updated: 2024/02/04 20:28:49 by trosinsk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
-
-char	**envpath_create(char **envpath)
-{
-	char	*path[2];
-	char	**new_path;
-
-	path[0] = "/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin";
-	path[1] = NULL;
-	new_path = ft_split(path[0], ':');
-	return (new_path);
-}
 
 void	ft_free(char **tab)
 {
@@ -97,4 +86,31 @@ char	*ft_strcpy(char *dst, char *src)
 	}
 	dst[i] = '\0';
 	return (dst);
+}
+
+int	mini_gnl(char **line)
+{
+	char	*buffer;
+	int		i;
+	int		r;
+	char	c;
+
+	i = 0;
+	r = 0;
+	buffer = (char *)malloc(10000);
+	if (!buffer)
+		return (-1);
+	r = read(0, &c, 1);
+	while (r && c != '\n' && c != '\0')
+	{
+		if (c != '\n' && c != '\0')
+			buffer[i] = c;
+		i++;
+		r = read(0, &c, 1);
+	}
+	buffer[i] = '\n';
+	buffer[++i] = '\0';
+	*line = buffer;
+	free(buffer);
+	return (r);
 }

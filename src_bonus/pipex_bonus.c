@@ -6,41 +6,13 @@
 /*   By: trosinsk <trosinsk@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/21 19:32:00 by trosinsk          #+#    #+#             */
-/*   Updated: 2024/02/03 21:12:04 by trosinsk         ###   ########.fr       */
+/*   Updated: 2024/02/04 22:12:52 by trosinsk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
 
 // sleep(10000);
-// void	quotes_way(char *cmd, char **envpath)
-// {
-// 	char	**cmd_val;
-// 	char	*path;
-// 	char	*cmd_line[3];
-
-// 	cmd_val = ft_split(cmd, ' ');
-// 	cmd_line[0] = ft_strdup(cmd_val[0]);
-// 	cmd_line[1] = ft_strdup(&cmd[ft_strlen(cmd_val[0]) + 1]);
-// 	if ((ft_strchr(cmd, '\'') && ft_strchr(cmd, '\"'))
-// 		&& (ft_strchr(cmd, '\'') < ft_strchr(cmd, '\"')))
-// 		cmd_line[1] = ft_strtrim(cmd_line[1], "\'");
-// 	else
-// 	{
-// 		cmd_line[1] = ft_strtrim(cmd_line[1], "\'");
-// 		cmd_line[1] = ft_strtrim(cmd_line[1], "\"");
-// 	}
-// 	cmd_line[2] = NULL;
-// 	path = get_path(cmd_val[0], envpath);
-// 	if (execve(path, cmd_line, envpath) == -1)
-// 	{
-// 		ft_putstr_fd("pipex: ", 2);
-// 		ft_putstr_fd(cmd_val[0], 2);
-// 		ft_putendl_fd(": command not found", 2);
-// 		ft_free(cmd_val);
-// 		exit(127);
-// 	}
-// }
 
 void	parser(char *cmd, char **envpath)
 {
@@ -95,39 +67,75 @@ void	pipe_maker(char *cmd, char **envpath)
 	}
 }
 
-void	error_argc(void)
+void	here_doc(char *delimiter, int argc)
 {
-	ft_putstr_fd("./pipex infile cmd cmd outfile\n", 2);
-	exit(1);
+	pid_t	read;
+	int		fd[2];
+	char	*line;
+
+	if (argc < 6)
+		error_here_doc();
+	if (pipe(fd) == -1)
+		exit(1);
+	read = fork();
+	if (read == 0)
+	{
+		close(fd[0]);
+		while (mini_gnl(&line))
+		{
+			if (ft_strncmp(line, delimiter, ft_strlen(delimiter)) == 0)
+				exit(EXIT_SUCCESS);
+			write(fd[1], line, ft_strlen(line));
+		}
+	}
+	else
+	{
+		close(fd[1]);
+		dup2(fd[0], STDIN_FILENO);
+		wait(NULL);
+	}
 }
 
-void	input_error(void)
+int	performer(int in_fd, int argc, char **argv, char **envpath)
 {
-	ft_putendl_fd("pipex: input: No such file or directory", 2);
-	exit (1);
+	int	i;
+	int	out_fd;
+
+	if (ft_strncmp(argv[1], "here_doc", 8) == 0)
+	{
+		i = 3;
+		out_fd = open(argv[argc - 1], O_WRONLY | O_CREAT | O_APPEND, 0644);
+		here_doc(argv[2], argc);
+	}
+	else
+	{
+		i = 2;
+		in_fd = open(argv[1], O_RDONLY, 0644);
+		if (in_fd == -1)
+			input_error();
+		dup2(in_fd, STDIN_FILENO);
+		close(in_fd);
+		out_fd = open(argv[argc - 1], O_CREAT | O_RDWR | O_TRUNC, 0644);
+		if (out_fd == -1)
+			exit (1);
+		while (i < argc - 2)
+			pipe_maker(argv[i++], envpath);
+	}
+	return (out_fd);
 }
 
 int	main( int argc, char **argv, char **envpath)
 {
-	int		i;
-	int		infile_fd;
-	int		outfile_fd;
+	int		in_fd;
+	int		out_fd;
 
+	in_fd = 0;
 	if (argc >= 5)
 	{
-		i = 2;
-		infile_fd = open(argv[1], O_RDONLY, 0644);
-		if (infile_fd == -1)
-			input_error();
-		dup2(infile_fd, STDIN_FILENO);
-		close(infile_fd);
-		while (i < argc - 2)
-			pipe_maker(argv[i++], envpath);
-		outfile_fd = open(argv[argc - 1], O_CREAT | O_RDWR | O_TRUNC, 0644);
-		if (outfile_fd == -1)
-			exit (1);
-		dup2(outfile_fd, STDOUT_FILENO);
-		close(outfile_fd);
+		// sleep(10000);
+		out_fd = performer(in_fd, argc, argv, envpath);
+		dup2(out_fd, STDOUT_FILENO);
+		close(out_fd);
 		parser(argv[argc - 2], envpath);
 		wait(NULL);
 	}
