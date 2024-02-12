@@ -6,17 +6,26 @@
 /*   By: trosinsk <trosinsk@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/02/03 20:25:48 by trosinsk          #+#    #+#             */
-/*   Updated: 2024/02/03 20:35:03 by trosinsk         ###   ########.fr       */
+/*   Updated: 2024/02/11 20:18:43 by trosinsk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex.h"
 
+// void	cmd_error_print(char *str, char **arr)
+// {
+// 	ft_putstr_fd("pipex: ", 2);
+// 	ft_putstr_fd(str, 2);
+// 	ft_putendl_fd(": command not found", 2);
+// 	ft_free(arr);
+// 	exit(127);
+// }
+
 void	cmd_error_print(char *str, char **arr)
 {
 	ft_putstr_fd("pipex: ", 2);
-	ft_putstr_fd(str, 2);
-	ft_putendl_fd(": command not found", 2);
+	ft_putstr_fd("command not found: ", 2);
+	ft_putendl_fd(str, 2);
 	ft_free(arr);
 	exit(127);
 }

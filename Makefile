@@ -1,9 +1,8 @@
 NAME = pipex
 CC = cc
 RM = rm -f
-FLAGS = -Wall -Wextra -Werror
+FLAGS := -Wextra -Wall -Werror #-fsanitize=address -g
 LIBFTDIR = libft/
-PTFDIR = printf/
 
 SRC = src/pipex.c \
       src/utils.c \
@@ -18,29 +17,25 @@ BNS = src_bonus/pipex_bonus.c \
 OBJ = ${SRC:.c=.o}
 OBJ_2 = ${BNS:.c=.o}
 
-INCLUDE = -L ./libft -lft -L ./printf -lft
+INCLUDE = -L ./libft -lft
 
 ${NAME}: ${OBJ}
 	make -C $(LIBFTDIR)
-	make -C $(PTFDIR)
 	${CC} ${FLAGS} ${OBJ} -o ${NAME} ${INCLUDE}
 
 all: ${NAME}
 
 bonus : ${OBJ_2}
 	make -C $(LIBFTDIR)
-	make -C $(PTFDIR)
 	${CC} ${FLAGS} ${OBJ_2} -o ${NAME} ${INCLUDE}
 
 clean:
 	${RM} ${OBJ} ${OBJ_2} ${NAME}
 	@cd $(LIBFTDIR) && $(MAKE) clean
-	@cd $(PTFDIR) && $(MAKE) clean
 
 fclean: clean
 	${RM} ${NAME}
 	@cd $(LIBFTDIR) && $(MAKE) fclean
-	@cd $(PTFDIR) && $(MAKE) fclean
 
 re: clean all
 

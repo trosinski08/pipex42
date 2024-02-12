@@ -6,7 +6,7 @@
 /*   By: trosinsk <trosinsk@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/20 19:09:46 by trosinsk          #+#    #+#             */
-/*   Updated: 2024/02/04 20:43:35 by trosinsk         ###   ########.fr       */
+/*   Updated: 2024/02/11 19:46:29 by trosinsk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -112,9 +112,9 @@ int	main(int argc, char **argv, char **envpath)
 	if (pid1 == 0)
 		infile_processing(argv, fd, envpath);
 	outfile_processing(argv, fd, envpath);
+	waitpid(pid1, &status, 0);
 	close (STDIN_FILENO);
 	close (STDOUT_FILENO);
-	waitpid(pid1, &status, 0);
 	if (WIFEXITED(status))
 		exit(WEXITSTATUS(status));
 	else

@@ -6,7 +6,7 @@
 /*   By: trosinsk <trosinsk@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/01/21 19:32:00 by trosinsk          #+#    #+#             */
-/*   Updated: 2024/02/04 22:12:52 by trosinsk         ###   ########.fr       */
+/*   Updated: 2024/02/12 12:59:46 by trosinsk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -26,8 +26,9 @@ void	parser(char *cmd, char **envpath)
 		if (execve(path, &cmd, envpath) == -1)
 		{
 			ft_putstr_fd("pipex: ", 2);
-			ft_putstr_fd(path, 2);
-			ft_putendl_fd(": command not found", 2);
+			ft_putstr_fd("command not found: ", 2);
+			ft_putendl_fd(str, 2);
+			ft_free(arr);
 			exit(127);
 		}
 	}
@@ -118,12 +119,13 @@ int	performer(int in_fd, int argc, char **argv, char **envpath)
 		out_fd = open(argv[argc - 1], O_CREAT | O_RDWR | O_TRUNC, 0644);
 		if (out_fd == -1)
 			exit (1);
-		while (i < argc - 2)
-			pipe_maker(argv[i++], envpath);
 	}
+	while (i < argc - 2)
+		pipe_maker(argv[i++], envpath);
 	return (out_fd);
 }
 
+// sleep(10000);
 int	main( int argc, char **argv, char **envpath)
 {
 	int		in_fd;
@@ -132,7 +134,6 @@ int	main( int argc, char **argv, char **envpath)
 	in_fd = 0;
 	if (argc >= 5)
 	{
-		// sleep(10000);
 		out_fd = performer(in_fd, argc, argv, envpath);
 		dup2(out_fd, STDOUT_FILENO);
 		close(out_fd);
