@@ -11,6 +11,7 @@
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
+#include "../../libft/include/libft.h" // Added for ft_strcmp
 
 void	ft_free(char **tab)
 {
@@ -72,45 +73,4 @@ char	*get_path(char *cmd, char **env)
 	}
 	ft_free(allpath);
 	return (cmd);
-}
-
-char	*ft_strcpy(char *dst, char *src)
-{
-	int	i;
-
-	i = 0;
-	while (src[i])
-	{
-		dst[i] = src[i];
-		i++;
-	}
-	dst[i] = '\0';
-	return (dst);
-}
-
-int	mini_gnl(char **line)
-{
-	char	*buffer;
-	int		i;
-	int		r;
-	char	c;
-
-	i = 0;
-	r = 0;
-	buffer = (char *)malloc(10000);
-	if (!buffer)
-		return (-1);
-	r = read(0, &c, 1);
-	while (r && c != '\n' && c != '\0')
-	{
-		if (c != '\n' && c != '\0')
-			buffer[i] = c;
-		i++;
-		r = read(0, &c, 1);
-	}
-	buffer[i] = '\n';
-	buffer[++i] = '\0';
-	*line = buffer;
-	free(buffer);
-	return (r);
 }

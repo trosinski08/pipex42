@@ -17,16 +17,17 @@
 # include <stdio.h>
 # include <string.h>
 # include <unistd.h>
-# include <sys/wait.h>
 # include <fcntl.h>
-# include "../libft/libft.h"
+# include <sys/types.h>
+# include <sys/wait.h>
+# include "../libft/include/libft.h"
 
 void	ft_free(char **tab);
 void	quotes_way(char *cmd, char **envpath);
 void	cmd_error_print(char *str, char **arr);
 char	*get_path(char *cmd_val, char **env);
 char	*my_getenv(char *name, char **env);
-char	*ft_char_remove(char *cmd, char c);
 char	*ft_strcpy(char *dst, char *src);
+int		ft_strcmp(const char *s1, const char *s2);
 
 #endif

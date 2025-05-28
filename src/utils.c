@@ -62,6 +62,16 @@ char	*my_getenv(char *name, char **env)
 	return (NULL);
 }
 
+void	helper(char *path, char *cmd, char **exec, char **path_part)
+{
+	*path_part = ft_strjoin(path, "/");
+	*exec = ft_strjoin(*path_part, cmd);
+	free(*path_part);
+	if (access(*exec, F_OK | X_OK) == 0)
+		return ;
+	free(*exec);
+}
+
 char	*get_path(char *cmd, char **env)
 {
 	int		i;
@@ -74,29 +84,9 @@ char	*get_path(char *cmd, char **env)
 		allpath = ft_split(my_getenv("PATH", env), ':');
 	else
 		allpath = envpath_create(env);
+	if (!allpath)
+		return (NULL);
 	while (allpath[++i])
-	{
-		path_part = ft_strjoin(allpath[i], "/");
-		exec = ft_strjoin(path_part, cmd);
-		free(path_part);
-		if (access(exec, F_OK | X_OK) == 0)
-			return (exec);
-		free(exec);
-	}
-	ft_free(allpath);
-	return (cmd);
-}
-
-char	*ft_strcpy(char *dst, char *src)
-{
-	int	i;
-
-	i = 0;
-	while (src[i])
-	{
-		dst[i] = src[i];
-		i++;
-	}
-	dst[i] = '\0';
-	return (dst);
+		helper(allpath[i], cmd, &exec, &path_part);
+	return (ft_free(allpath), NULL);
 }

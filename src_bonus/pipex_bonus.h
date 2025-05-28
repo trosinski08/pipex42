@@ -17,11 +17,11 @@
 # include <stdio.h>
 # include <string.h>
 # include <unistd.h>
-# include <sys/wait.h>
 # include <fcntl.h>
-# include "../libft/libft.h"
+# include <sys/types.h>
+# include <sys/wait.h>
+# include "../libft/include/libft.h"
 
-int		mini_gnl(char **line);
 char	*get_path(char *cmd_val, char **env);
 char	*my_getenv(char *name, char **env);
 void	ft_free(char **tab);
@@ -34,5 +34,10 @@ void	error_here_doc(void);
 void	here_doc(char *delimiter, int argc);
 void	parser(char *cmd, char **envpath);
 char	**envpath_create(char **envpath);
+void	pipe_maker(char *cmd, char **envpath);
+void	here_doc_helper(char *line, char *delimiter, int pipe_fd_write_end);
+static void	handle_input_redirection(int argc, char **argv, \
+		int *cmd_start_index, int is_here_doc);
+int		performer(int argc, char **argv, char **envpath);
 
 #endif

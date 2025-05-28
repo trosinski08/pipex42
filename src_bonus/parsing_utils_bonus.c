@@ -11,6 +11,46 @@
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
+#include <stdio.h>  // For perror
+#include <stdlib.h> // For exit, EXIT_SUCCESS, EXIT_FAILURE, free
+#include <unistd.h> // For write, close
+
+/**
+ * @brief Helper for here_doc: processes one line of input.
+ * @details Compares line to delimiter. If match, closes pipe and exits child.
+ *          Else, writes line to pipe. Exits on write error. Frees line.
+ *          Assumes line, delimiter are valid, and pipe_write_fd is open.
+ * @param line Input line from get_next_line (has newline).
+ * @param delimiter Target delimiter string (no newline).
+ * @param pipe_write_fd Write-end file descriptor of the pipe.
+ */
+void	here_doc_helper(char *line, char *delimiter, int pipe_write_fd)
+{
+	size_t	delimiter_len;
+	size_t	line_len;
+
+	delimiter_len = ft_strlen(delimiter);
+	line_len = ft_strlen(line);
+	if (line_len == delimiter_len + 1 && \
+	line[delimiter_len] == '\n' && \
+	ft_strncmp(line, delimiter, delimiter_len) == 0)
+	{
+		free(line);
+		if (close(pipe_write_fd) == -1)
+			perror("pipex: hdh close match");
+		exit(EXIT_SUCCESS);
+	}
+
+	if (write(pipe_write_fd, line, line_len) == -1)
+	{
+		perror("pipex: hdh write");
+		free(line);
+		if (close(pipe_write_fd) == -1)
+			perror("pipex: hdh close write_err");
+		exit(EXIT_FAILURE);
+	}
+	free(line);
+}
 
 void	remove_chars(char *str, char *c)
 {
