@@ -5,13 +5,13 @@
 /*                                                    +:+ +:+         +:+     */
 /*   By: trosinsk <trosinsk@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/01/21 19:31:28 by trosinsk          #+#    #+#             */
-/*   Updated: 2024/02/04 20:28:49 by trosinsk         ###   ########.fr       */
+/*   Created: 2024/06/24 03:25:42 by trosinsk          #+#    #+#             */
+/*   Updated: 2024/06/24 03:25:42 by trosinsk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
 #include "pipex_bonus.h"
-#include "../../libft/include/libft.h" // Added for ft_strcmp
+#include "../../libft/include/libft.h"
 
 void	ft_free(char **tab)
 {
@@ -50,27 +50,57 @@ char	*my_getenv(char *name, char **env)
 	return (NULL);
 }
 
+static char	*check_direct_path(char *cmd)
+{
+	if (!cmd || !cmd[0])
+		return (NULL);
+	if (access(cmd, F_OK | X_OK) == 0)
+		return (ft_strdup(cmd));
+	return (NULL);
+}
+
+static char	*search_in_paths(char **paths, char *cmd)
+{
+	char	*exec;
+	char	*path;
+	int		i;
+
+	i = 0;
+	while (paths[i])
+	{
+		exec = ft_strjoin(paths[i], "/");
+		path = ft_strjoin(exec, cmd);
+		free(exec);
+		if (path)
+		{
+			if (access(path, F_OK | X_OK) == 0)
+			{
+				ft_free(paths);
+				return (path);
+			}
+			free(path);
+		}
+		i++;
+	}
+	return (NULL);
+}
+
 char	*get_path(char *cmd, char **env)
 {
-	int		i;
-	char	*exec;
-	char	**allpath;
-	char	*path_part;
+	char	**paths;
+	char	*path_env;
+	char	*result;
 
-	i = -1;
-	if (env[0] != NULL)
-		allpath = ft_split(my_getenv("PATH", env), ':');
-	else
-		allpath = envpath_create(env);
-	while (allpath[++i])
-	{
-		path_part = ft_strjoin(allpath[i], "/");
-		exec = ft_strjoin(path_part, cmd);
-		free(path_part);
-		if (access(exec, F_OK | X_OK) == 0)
-			return (exec);
-		free(exec);
-	}
-	ft_free(allpath);
-	return (cmd);
+	result = check_direct_path(cmd);
+	if (result)
+		return (result);
+	path_env = my_getenv("PATH", env);
+	if (!path_env)
+		path_env = "/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin";
+	paths = ft_split(path_env, ':');
+	if (!paths)
+		return (NULL);
+	result = search_in_paths(paths, cmd);
+	ft_free(paths);
+	return (result);
 }

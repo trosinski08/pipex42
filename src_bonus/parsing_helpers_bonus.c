@@ -1,35 +1,50 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   parsing_utils.c                                    :+:      :+:    :+:   */
+/*   parsing_helpers_bonus.c                            :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: trosinsk <trosinsk@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/02/03 20:25:48 by trosinsk          #+#    #+#             */
-/*   Updated: 2024/02/11 20:18:43 by trosinsk         ###   ########.fr       */
+/*   Created: 2024/06/02 16:28:00 by trosinsk          #+#    #+#             */
+/*   Updated: 2024/06/02 16:28:00 by trosinsk         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "pipex.h"
+#include "pipex_bonus.h"
 
-// void	cmd_error_print(char *str, char **arr)
-// {
-// 	ft_putstr_fd("pipex: ", 2);
-// 	ft_putstr_fd(str, 2);
-// 	ft_putendl_fd(": command not found", 2);
-// 	ft_free(arr);
-// 	exit(127);
-// }
-
-void	cmd_error_print(char *str, char **arr)
+/**
+ * Removes specified characters from a string
+ * 
+ * @param str The string to modify
+ * @param c String containing characters to remove
+ */
+void	remove_chars(char *str, char *c)
 {
-	ft_putstr_fd("pipex: ", 2);
-	ft_putstr_fd("command not found: ", 2);
-	ft_putendl_fd(str, 2);
-	ft_free(arr);
-	exit(127);
+	char	*char_pos;
+	int		i;
+
+	i = 0;
+	if (str != NULL)
+	{
+		while (c[i] != '\0')
+		{
+			char_pos = ft_strchr(str, c[i]);
+			while (char_pos != NULL)
+			{
+				ft_strlcpy(char_pos, char_pos + 1, ft_strlen(char_pos));
+				char_pos = ft_strchr(str, c[i]);
+			}
+			i++;
+		}
+	}
 }
 
+/**
+ * Handles commands with quotes in them
+ * 
+ * @param cmd The command string with quotes
+ * @param envpath Environment path array
+ */
 void	quotes_way(char *cmd, char **envpath)
 {
 	char	**cmd_val;
@@ -54,5 +69,5 @@ void	quotes_way(char *cmd, char **envpath)
 	cmd_line[2] = NULL;
 	path = get_path(cmd_val[0], envpath);
 	if (execve(path, cmd_line, envpath) == -1)
-		cmd_error_print(cmd_line[0], cmd_line);
+		error_handler(path, cmd_line[0], cmd_line);
 }

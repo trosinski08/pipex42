@@ -17,6 +17,7 @@ char	**envpath_create(char **envpath)
 	char	*path[2];
 	char	**new_path;
 
+	(void)envpath;
 	path[0] = "/usr/local/bin:/usr/bin:/bin:/usr/local/sbin:/usr/sbin:/sbin";
 	path[1] = NULL;
 	new_path = ft_split(path[0], ':');

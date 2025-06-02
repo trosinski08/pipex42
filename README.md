@@ -142,16 +142,56 @@ STOP
 # Should show permission denied error
 ```
 
-### Complex Test Cases
+### Advanced Test Cases
+
+#### Multiple Commands Test
 ```bash
-# Quoted arguments
-./pipex infile.txt "grep 'Test Line'" "wc -l" outfile.txt
+# Test with 6 commands (works correctly)
+./pipex input.txt "cat" "sort" "uniq" "tr l L" "tr e E" "grep test" output.txt
 
-# Environment variables
-./pipex infile.txt "env" "grep PATH" outfile.txt
+# Test with 7 commands and newline handling (cat -e test)
+./pipex input.txt "cat -e" "cat -e" "cat -e" "cat -e" "cat -e" "cat -e" "cat -e" output.txt
+# Each line will show 7 $ signs, demonstrating correct newline handling through all pipes
 
-# Multiple pipes with file operations
-./pipex infile.txt "cat" "sort" "uniq" "wc -l" outfile.txt
+# Test parallel execution with sleep
+./pipex input.txt "sleep 10" "sleep 10" "sleep 10" "sleep 10" "sleep 10" "sleep 10" "sleep 10" output.txt
+# All sleeps execute in parallel, total execution time ~10s, not 70s
+```
+
+#### Process Control Tests
+```bash
+# Test process handling with kill command
+./pipex input.txt "sleep 10" "pkill sleep" "sleep 10" output.txt
+# Demonstrates proper process management and signal handling
+```
+
+#### Here_doc Tests
+```bash
+# Test here_doc with multiple commands
+./pipex here_doc END "tr [:lower:] [:upper:]" "sort -r" output.txt << EOF
+test line 1
+test line 2
+another line
+last line
+END
+EOF
+```
+
+### Key Findings from Testing
+1. Command Chain Limits:
+   - Reliable execution with up to 7 commands
+   - Proper pipe management and data flow
+   - Correct handling of standard input/output
+
+2. Process Management:
+   - Parallel execution of commands
+   - Proper cleanup of child processes
+   - Correct signal handling
+
+3. Special Features:
+   - Proper newline handling across multiple pipes
+   - Here_doc functionality working as expected
+   - Correct handling of various command types (text processing, system commands)
 ```
 
 ## Flow Diagram

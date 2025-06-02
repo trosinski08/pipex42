@@ -49,3 +49,21 @@ void	cmd_error_print(char *str, char **arr)
 	ft_free(arr);
 	exit(127);
 }
+
+void	error_handler(char *path, char *cmd, char **cmd_line)
+{
+	ft_putstr_fd("pipex: ", 2);
+	if (cmd)
+		ft_putstr_fd(cmd, 2);
+	ft_putendl_fd(": command not found", 2);
+	if (path)
+		free(path);
+	if (cmd_line)
+	{
+		if (cmd_line[0])
+			free(cmd_line[0]);
+		if (cmd_line[1])
+			free(cmd_line[1]);
+	}
+	exit(127);
+}

@@ -1,4 +1,0 @@
-linia pierwsza/1st line
-druga linia tekstu/2nd line
-jeszcze jedna linia/3rd line
-koniec/End
